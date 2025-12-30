@@ -1,0 +1,35 @@
+--- STARTING REALISTIC DEADLOCK SIMULATION ---
+Config: Single Core Affinity, Priority Inversion Enforced.
+[APP] Thread started (Low Priority, No Boost). Waiting for data...
+
+[ISR] HARDWARE INTERRUPT! Packet #1 arrived.
+[ISR] Attempting to acquire buffer lock (Spinning)...
+[ISR] Lock acquired. Updating buffer pointers.
+[APP] Processing packet... (Busy for 20 ms)
+
+[ISR] HARDWARE INTERRUPT! Packet #2 arrived.
+[ISR] Attempting to acquire buffer lock (Spinning)...
+[APP] Packet processed. Buffer unlocked.
+[ISR] Lock acquired. Updating buffer pointers.
+[APP] Processing packet... (Busy for 20 ms)
+
+[ISR] HARDWARE INTERRUPT! Packet #3 arrived.
+[ISR] Attempting to acquire buffer lock (Spinning)...
+[APP] Packet processed. Buffer unlocked.
+[ISR] Lock acquired. Updating buffer pointers.
+[APP] Processing packet... (Busy for 20 ms)
+[APP] Packet processed. Buffer unlocked.
+
+[ISR] HARDWARE INTERRUPT! Packet #4 arrived.
+[ISR] Attempting to acquire buffer lock (Spinning)...
+[ISR] Lock acquired. Updating buffer pointers.
+[APP] Processing packet... (Busy for 20 ms)
+
+[ISR] HARDWARE INTERRUPT! Packet #5 arrived.
+[ISR] Attempting to acquire buffer lock (Spinning)...
+[APP] Packet processed. Buffer unlocked.
+[ISR] Lock acquired. Updating buffer pointers.
+[APP] Processing packet... (Busy for 20 ms)
+[APP] Packet processed. Buffer unlocked.
+
+--- SIMULATION SURVIVED (Unexpected) ---
