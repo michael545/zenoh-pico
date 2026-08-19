@@ -43,7 +43,7 @@ void z_random_fill(void *buf, size_t len) {
 void *z_malloc(size_t size) {
     void *ptr = NULL;
 
-    uint8_t r = tx_byte_allocate(pthreadx_byte_pool, &ptr, size, TX_NO_WAIT);
+    uint8_t r = tx_byte_allocate(pthreadx_byte_pool, &ptr, size, TX_WAIT_FOREVER);
     if (r != TX_SUCCESS) {
         ptr = NULL;
     }
@@ -83,7 +83,11 @@ z_result_t _z_task_join(_z_task_t *task) {
         tx_thread_sleep(1);
     }
 
-    tx_thread_delete(&(task->threadx_thread));
+    UINT del_status = tx_thread_delete(&(task->threadx_thread));
+    if (del_status != TX_SUCCESS && del_status != TX_THREAD_ERROR) {
+        _Z_ERROR_RETURN(_Z_ERR_GENERIC);
+    }
+
     return _Z_RES_OK;
 }
 
@@ -93,8 +97,11 @@ z_result_t _z_task_detach(_z_task_t *task) {
 }
 
 z_result_t _z_task_cancel(_z_task_t *task) {
-    // Not implemented
-    _Z_ERROR_RETURN(_Z_ERR_GENERIC);
+    UINT status = tx_thread_terminate(&(task->threadx_thread));
+    if (status != TX_SUCCESS && status != TX_THREAD_ERROR) {
+        _Z_ERROR_RETURN(_Z_ERR_GENERIC);
+    }
+    return _Z_RES_OK;
 }
 
 void _z_task_exit(void) {  // NEW with new vesion
@@ -223,7 +230,8 @@ z_result_t _z_condvar_wait_until(_z_condvar_t *cv, _z_mutex_t *m, const z_clock_
     }
 
     ULONG now = tx_time_get();
-    ULONG target_time = ((abstime->tv_sec * 1000ULL + abstime->tv_nsec / 1000000ULL) * TX_TIMER_TICKS_PER_SECOND) / 1000ULL;
+    ULONG target_time =
+        ((abstime->tv_sec * 1000ULL + abstime->tv_nsec / 1000000ULL) * TX_TIMER_TICKS_PER_SECOND) / 1000ULL;
     ULONG block_duration = (target_time > now) ? (target_time - now) : 0;
 
     tx_mutex_get(&cv->mutex, TX_WAIT_FOREVER);
